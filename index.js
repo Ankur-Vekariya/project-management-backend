@@ -5,6 +5,8 @@ let bodyParser = require("body-parser");
 // Express Route
 const userRoute = require("./routes/user.routes.js");
 const projectRoute = require("./routes/project.routes.js");
+const sprintRoute = require("./routes/sprints.routes.js");
+
 
 // const studentRoute = require("./routes/student.route.js");
 // const productRoute = require("./routes/product.route.js");
@@ -34,6 +36,8 @@ app.use(cors());
 // app.use("/students", studentRoute);
 app.use("/users", userRoute);
 app.use("/projects", projectRoute);
+app.use("/sprints", sprintRoute);
+
 
 // app.use("/floor", floorRoute);
 // app.use("/room", roomRoute);

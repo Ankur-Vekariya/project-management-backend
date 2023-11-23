@@ -2,23 +2,40 @@ let mongoose = require("mongoose"),
   express = require("express"),
   router = express.Router();
 // Student Model
+let sprintSchema = require("../models/sprints.model");
 let projectSchema = require("../models/project.model");
 
 // CREATE Student
 
-router.route("/create-project").post((req, res, next) => {
-  projectSchema
+router.route("/create-sprint").post((req, res, next) => {
+  sprintSchema
     .create({
-      projectName: req.body.projectName,
+      sprintName: req.body.sprintName,
       description: req.body.description,
-      technology: req.body.technology,
+      extra: req.body.extra,
       createdBy: req.body.createdBy,
       assignedTo: req.body.assignedTo,
-      sprints: req.body.sprints ? req.body.sprints : [],
+      projectId: req.body.projectId,
     })
     .then((data) => {
       console.log("data", data);
-      res.json(data);
+      projectSchema
+        .findByIdAndUpdate(
+          { _id: req.body.projectId },
+          {
+            $addToSet: {
+              sprints: data._id,
+            },
+          }
+        )
+        .then((data) => {
+          console.log("data---", data);
+          res.json(data);
+        })
+        .catch((error) => {
+          res.send(error);
+        });
+      // res.json(data);
     })
     .catch((error) => {
       console.log("error", error);
@@ -71,29 +88,24 @@ router.route("/get-category").get((req, res) => {
 //   });
 // });
 
-// Update Student
-router.route("/edit-project/:id").put((req, res, next) => {
-  projectSchema
-    .findByIdAndUpdate(req.params.id, {
-      $set: req.body,
-    })
-    .then((data) => {
-      console.log("data---", data);
-      res.json(data);
-    })
-    .catch((error) => {
-      res.send(error);
-    });
-  // (error, data) => {
-  //   if (error) {
-  //     return next(error);
-  //     console.log(error);
-  //   } else {
-  //     res.json(data);
-  //     console.log("Student updated successfully !");
-  //   }
-  // }
-});
+// // Update Student
+// router.route("/update-floor/:id").put((req, res, next) => {
+//   floorSchema.findByIdAndUpdate(
+//     req.params.id,
+//     {
+//       $set: req.body,
+//     },
+//     (error, data) => {
+//       if (error) {
+//         return next(error);
+//         console.log(error);
+//       } else {
+//         res.json(data);
+//         console.log("Student updated successfully !");
+//       }
+//     }
+//   );
+// });
 // // Delete Student
 // router.route("/delete-floor/:id").delete((req, res, next) => {
 //   floorSchema.findByIdAndRemove(req.params.id, (error, data) => {

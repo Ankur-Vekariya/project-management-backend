@@ -1,25 +1,23 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-let projectSchema = new Schema(
+let sprintSchema = new Schema(
   {
-    projectName: {
+    sprintName: {
       type: String,
     },
     description: {
       type: String,
     },
-    technology: {
+    extra: {
       type: String,
     },
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
     assignedTo: { type: Schema.Types.ObjectId, ref: "User" },
-    sprints: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Sprint',
-    }],
+    projectId: { type: Schema.Types.ObjectId, ref: "Projects" },
+
   },
   {
-    collection: "project",
+    collection: "sprints",
   }
 );
-module.exports = mongoose.model("project", projectSchema);
+module.exports = mongoose.model("sprints", sprintSchema);
