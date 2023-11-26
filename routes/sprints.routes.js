@@ -7,7 +7,7 @@ let projectSchema = require("../models/project.model");
 
 // CREATE Student
 
-router.route("/create-sprint").post((req, res, next) => {
+router.route("/create-sprint/:projectId").post((req, res, next) => {
   sprintSchema
     .create({
       sprintName: req.body.sprintName,
@@ -15,13 +15,13 @@ router.route("/create-sprint").post((req, res, next) => {
       extra: req.body.extra,
       createdBy: req.body.createdBy,
       assignedTo: req.body.assignedTo,
-      projectId: req.body.projectId,
+      projectId: req.params.projectId,
     })
     .then((data) => {
       console.log("data", data);
       projectSchema
         .findByIdAndUpdate(
-          { _id: req.body.projectId },
+          { _id: req.params.projectId },
           {
             $addToSet: {
               sprints: data._id,
@@ -30,12 +30,12 @@ router.route("/create-sprint").post((req, res, next) => {
         )
         .then((data) => {
           console.log("data---", data);
-          res.json(data);
+          // res.json(data);
         })
         .catch((error) => {
-          res.send(error);
+          // res.send(error);
         });
-      // res.json(data);
+      res.json(data);
     })
     .catch((error) => {
       console.log("error", error);
@@ -49,6 +49,18 @@ router.route("/").get((req, res) => {
     .find()
     .then((data) => {
       console.log("data---", data);
+      res.json(data);
+    })
+    .catch((error) => {
+      res.send(error);
+    });
+});
+
+router.route("/sprint/:sprintId").get((req, res) => {
+  sprintSchema
+    .find({ _id: req.params.sprintId })
+    .then((data) => {
+      console.log("sprintId  data---", data);
       res.json(data);
     })
     .catch((error) => {

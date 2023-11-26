@@ -38,6 +38,18 @@ router.route("/").get((req, res) => {
       res.send(error);
     });
 });
+
+router.route("/project-details/:projectId").get((req, res) => {
+  projectSchema
+    .find({ _id: req.params.projectId })
+    .then((data) => {
+      console.log("project details data---", data);
+      res.json(data);
+    })
+    .catch((error) => {
+      res.send(error);
+    });
+});
 // get category by id
 router.route("/get-category").get((req, res) => {
   console.log(req.body.categories);
