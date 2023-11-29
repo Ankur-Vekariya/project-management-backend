@@ -67,6 +67,20 @@ router.route("/sprint/:sprintId").get((req, res) => {
       res.send(error);
     });
 });
+
+router.route("/sprints").post((req, res) => {
+  console.log("req.body.sprints", req.body.sprints);
+  sprintSchema
+    .find({ _id: { $in: req.body.sprints } })
+    .then(async (data) => {
+      console.log("sprint data---", data);
+      res.json(data);
+    })
+    .catch((error) => {
+      res.send(error);
+    });
+});
+
 // get category by id
 router.route("/get-category").get((req, res) => {
   console.log(req.body.categories);
