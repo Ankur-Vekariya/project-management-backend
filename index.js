@@ -2,17 +2,14 @@ let express = require("express");
 let mongoose = require("mongoose");
 let cors = require("cors");
 let bodyParser = require("body-parser");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+
 // Express Route
 const userRoute = require("./routes/user.routes.js");
 const projectRoute = require("./routes/project.routes.js");
 const sprintRoute = require("./routes/sprints.routes.js");
-
-
-// const studentRoute = require("./routes/student.route.js");
-// const productRoute = require("./routes/product.route.js");
-// const floorRoute = require("./routes/floor.route.js");
-// const roomRoute = require("./routes/room.route.js");
-// const categoryRoute = require("./routes/category.route.js");
+dotenv.config({ path: "./config.env" });
 
 // Connecting mongoDB Database
 mongoose
@@ -32,16 +29,72 @@ app.use(
     extended: true,
   })
 );
+
+const authenticateUser = (req, res, next) => {
+  let tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
+  let jwtSecretKey = process.env.JWT_SECRET_KEY;
+
+  try {
+    const token = req.header(tokenHeaderKey);
+
+    const verified = jwt.verify(token, jwtSecretKey);
+    if (verified) {
+      next();
+    } else {
+      // Access Denied
+      return res.status(401).send(error);
+    }
+  } catch (error) {
+    // Access Denied
+    return res.status(401).send(error);
+  }
+};
+
+app.post("/user/generateToken", (req, res) => {
+  // Validate User Here
+  // Then generate JWT Token
+
+  let jwtSecretKey = process.env.JWT_SECRET_KEY;
+  let data = {
+    time: Date(),
+    userId: 12,
+  };
+
+  const token = jwt.sign(data, jwtSecretKey);
+
+  res.send(token);
+});
+
+app.get("/user/validateToken", (req, res) => {
+  // Tokens are generally passed in header of request
+  // Due to security reasons.
+
+  let tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
+  let jwtSecretKey = process.env.JWT_SECRET_KEY;
+
+  console.log("-----------", tokenHeaderKey, jwtSecretKey);
+
+  try {
+    const token = req.header(tokenHeaderKey);
+
+    const verified = jwt.verify(token, jwtSecretKey);
+    if (verified) {
+      return res.send("Successfully Verified");
+    } else {
+      // Access Denied
+      return res.status(401).send(error);
+    }
+  } catch (error) {
+    // Access Denied
+    return res.status(401).send(error);
+  }
+});
+
 app.use(cors());
-// app.use("/students", studentRoute);
+
 app.use("/users", userRoute);
-app.use("/projects", projectRoute);
-app.use("/sprints", sprintRoute);
-
-
-// app.use("/floor", floorRoute);
-// app.use("/room", roomRoute);
-// app.use("/category", categoryRoute);
+app.use("/projects", authenticateUser, projectRoute);
+app.use("/sprints", authenticateUser, sprintRoute);
 
 // PORT
 const port = process.env.PORT || 4000;

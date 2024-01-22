@@ -3,16 +3,26 @@ let mongoose = require("mongoose"),
   router = express.Router();
 // Student Model
 let userSchema = require("../models/user.model");
-
-// CREATE Student
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config({ path: "./config.env" });
 
 router.route("/create-user").post((req, res, next) => {
+  const { userName, email, password, role } = req.body;
+  let jwtSecretKey = process.env.JWT_SECRET_KEY;
+  let data = {
+    time: Date(),
+    email: email,
+  };
+
+  const token = jwt.sign(data, jwtSecretKey);
   userSchema
     .create({
-      userName: req.body.userName,
-      email: req.body.email,
-      password: req.body.password,
-      role: req.body.role,
+      userName: userName,
+      email: email,
+      password: password,
+      role: role,
+      token: token,
     })
     .then((data) => {
       console.log("data", data);
@@ -25,6 +35,19 @@ router.route("/create-user").post((req, res, next) => {
     });
 });
 // READ all Students
+router.route("/login").post((req, res) => {
+  const { email, password, role } = req.body;
+  userSchema
+    .find({ email: email, password: password, role: role })
+    .then((data) => {
+      console.log("data---", data);
+      res.json(data);
+    })
+    .catch((error) => {
+      res.send(error);
+    });
+});
+
 router.route("/").get((req, res) => {
   userSchema
     .find()
@@ -61,10 +84,8 @@ router.route("/all/developer").get((req, res) => {
 });
 // get category by id
 router.route("/get-category").get((req, res) => {
-  console.log(req.body.categories);
   let response = [];
   let obj2 = req.body.categories.map((item) => {
-    console.log("item", item);
     return userSchema.findById(item, (error, data) => {
       if (error) {
         return next(error);
@@ -77,8 +98,6 @@ router.route("/get-category").get((req, res) => {
       }
     });
   });
-  console.log(obj2);
-
   res.json(response);
 });
 // Get Single Student
