@@ -2,12 +2,12 @@ let mongoose = require("mongoose"),
   express = require("express"),
   router = express.Router();
 // Student Model
-let projectSchema = require("../models/project.model");
+let commentSchema = require("../models/comments.model");
 
 // CREATE Student
 
 router.route("/create-comment").post((req, res, next) => {
-  projectSchema
+  commentSchema
     .create({
       comment: req.body.comment,
       projectId: req.body.projectId,
@@ -36,9 +36,9 @@ router.route("/").get((req, res) => {
     });
 });
 
-router.route("/project-details/:projectId").get((req, res) => {
-  projectSchema
-    .find({ _id: req.params.projectId })
+router.route("/by-project/:projectId").get((req, res) => {
+  commentSchema
+    .find({ projectId: req.params.projectId })
     .then((data) => {
       console.log("project details data---", data);
       res.json(data);

@@ -9,6 +9,8 @@ const dotenv = require("dotenv");
 const userRoute = require("./routes/user.routes.js");
 const projectRoute = require("./routes/project.routes.js");
 const sprintRoute = require("./routes/sprints.routes.js");
+const commentsRoute = require("./routes/comments.routes.js");
+
 dotenv.config({ path: "./config.env" });
 
 // Connecting mongoDB Database
@@ -95,6 +97,7 @@ app.use(cors());
 app.use("/users", userRoute);
 app.use("/projects", authenticateUser, projectRoute);
 app.use("/sprints", authenticateUser, sprintRoute);
+app.use("/comments", authenticateUser, commentsRoute);
 
 // PORT
 const port = process.env.PORT || 4000;
